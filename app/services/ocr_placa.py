@@ -1,8 +1,6 @@
 import json
-import os
-from typing import Optional
 
-import streamlit as st
+from app.services.gemini_client import get_client as _get_client
 
 MODEL_NAME = "gemini-2.5-flash"
 
@@ -36,33 +34,6 @@ RESPONSE_SCHEMA = {
     },
     "required": ["tag", "modelo", "fabricante", "potencia_w", "tensao_v"],
 }
-
-
-def _get_api_key() -> Optional[str]:
-    key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-    if key:
-        return key
-    try:
-        for nome in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
-            if nome in st.secrets:
-                val = st.secrets[nome]
-                if val:
-                    return val
-    except Exception:
-        pass
-    return None
-
-
-@st.cache_resource(show_spinner=False)
-def _get_client():
-    from google import genai
-    key = _get_api_key()
-    if not key:
-        raise RuntimeError(
-            "GEMINI_API_KEY nao configurada. Defina a variavel de ambiente "
-            "GEMINI_API_KEY ou adicione em .streamlit/secrets.toml."
-        )
-    return genai.Client(api_key=key)
 
 
 def _detect_mime(img_bytes: bytes) -> str:

@@ -12,8 +12,11 @@ init_db()
 aplicar_estilo_global()
 
 paginas = {
+    "Início": [
+        st.Page("app/pages/painel_alertas.py",       title="Painel de Alertas e Estados", default=True),
+    ],
     "Operação": [
-        st.Page("app/pages/navegacao_planta.py",     title="Navegação por Planta", default=True),
+        st.Page("app/pages/navegacao_planta.py",     title="Navegação por Planta"),
         st.Page("app/pages/dashboard_ativo.py",      title="Dashboard do Ativo"),
     ],
     "Cadastro": [
@@ -26,7 +29,7 @@ paginas = {
 
 with st.sidebar:
     st.markdown(
-        '<p style="text-align:center; color:#888; font-size:0.8rem; margin:0;">Sprint 2 — Visualização Operacional</p>',
+        '<p style="text-align:center; color:#888; font-size:0.8rem; margin:0;">Sprint 3 — Inteligência Operacional</p>',
         unsafe_allow_html=True,
     )
     st.divider()

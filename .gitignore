@@ -1,5 +1,9 @@
 .streamlit/secrets.toml
 
+.claude/
+roteiro_video_sprint2.docx
+artefatos/
+
 __pycache__/
 *.py[cod]
 *.egg-info/

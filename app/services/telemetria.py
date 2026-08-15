@@ -8,6 +8,9 @@ GRANDEZAS = ["temperatura", "vibracao", "corrente", "rpm"]
 
 JANELAS = {
     "1h":  {"delta": timedelta(hours=1),  "resample": None},
+    # janela do detector de anomalia: sem reamostragem, para preservar a grade
+    # nativa em que o modelo foi calibrado
+    "3h":  {"delta": timedelta(hours=3),  "resample": None},
     "24h": {"delta": timedelta(hours=24), "resample": "5min"},
     "7d":  {"delta": timedelta(days=7),   "resample": "1h"},
 }

@@ -5,6 +5,13 @@ from app.components.estilos import html_card_equipamento
 from app.services.equipamentos import listar_plantas, listar_areas, listar_por_area
 from app.services.telemetria import status_atual, ultima_leitura, get_limites
 
+
+def _fmt(valor, casas: int, unidade: str = "") -> str:
+    if valor is None:
+        return "—"
+    return f"{valor:.{casas}f} {unidade}".strip()
+
+
 cabecalho("Navegação por Planta")
 st.caption("Selecione uma Planta e Área para visualizar os ativos e seus respectivos status.")
 
@@ -70,10 +77,10 @@ for i in range(0, len(equipamentos), cols_por_linha):
             )
             if ult:
                 mc1, mc2 = st.columns(2)
-                mc1.caption(f"Temp: {ult['temperatura']:.1f} °C")
-                mc2.caption(f"Vib: {ult['vibracao']:.2f} mm/s")
-                mc1.caption(f"Corrente: {ult['corrente']:.1f} A")
-                mc2.caption(f"RPM: {ult['rpm']:.0f}")
+                mc1.caption(f"Temp: {_fmt(ult['temperatura'], 1, '°C')}")
+                mc2.caption(f"Vib: {_fmt(ult['vibracao'], 2, 'mm/s')}")
+                mc1.caption(f"Corrente: {_fmt(ult['corrente'], 1, 'A')}")
+                mc2.caption(f"RPM: {_fmt(ult['rpm'], 0)}")
             if st.button("Abrir Dashboard", key=f"open_{eq['TAG']}", use_container_width=True, type="primary"):
                 st.session_state["equipamento_selecionado"] = eq
                 st.switch_page("app/pages/dashboard_ativo.py")

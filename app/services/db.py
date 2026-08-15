@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS leituras (
     temperatura  REAL,
     vibracao     REAL,
     corrente     REAL,
-    rpm          REAL
+    rpm          REAL,
+    aceleracao   REAL
 );
 
 CREATE INDEX IF NOT EXISTS idx_leituras_tag_ts ON leituras(tag, ts);
@@ -65,6 +66,30 @@ CREATE TABLE IF NOT EXISTS limites (
     unidade  TEXT,
     fundo_escala REAL
 );
+
+CREATE TABLE IF NOT EXISTS eventos (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    tag           TEXT NOT NULL REFERENCES equipamentos(tag) ON DELETE CASCADE,
+    ts            TIMESTAMP NOT NULL,
+    origem        TEXT NOT NULL,       -- 'limite' | 'ml'
+    severidade    TEXT NOT NULL,       -- ok | warn | crit
+    grandeza      TEXT,
+    valor         REAL,
+    unidade       TEXT,
+    score         REAL,
+    threshold     REAL,
+    detectores    TEXT,                -- JSON
+    pista         TEXT,
+    titulo        TEXT,
+    resumo        TEXT,                -- texto gerado pela camada de NLP
+    recomendacoes TEXT,                -- JSON (lista de acoes)
+    origem_resumo TEXT,                -- 'gemini' | 'template'
+    assinatura    TEXT,                -- chave de deduplicacao
+    reconhecido   INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_eventos_ts ON eventos(ts DESC);
+CREATE INDEX IF NOT EXISTS idx_eventos_assinatura ON eventos(assinatura, ts DESC);
 """
 
 
@@ -75,21 +100,26 @@ PLANTAS_SEED = [
 ]
 
 EQUIPAMENTOS_SEED = [
-    ("EQ-001", "XR-200",    "Siemens",   1500, 220, 0, 0),
-    ("EQ-002", "Alpha-50",  "WEG",        750, 380, 0, 0),
-    ("EQ-003", "TurboMax",  "ABB",       3000, 220, 0, 1),
-    ("EQ-004", "ProLine-1", "Schneider", 2200, 127, 1, 0),
-    ("EQ-005", "XR-200",    "Siemens",   1500, 220, 1, 0),
-    ("EQ-006", "Compact-R", "WEG",        550, 380, 1, 1),
-    ("EQ-007", "Delta-V",   "ABB",       4000, 440, 2, 0),
-    ("EQ-008", "ProLine-2", "Schneider", 1800, 220, 2, 1),
+    ("EQ-001", "XR-200",        "Siemens",   1500, 220, 0, 0),
+    ("EQ-002", "Alpha-50",      "WEG",        750, 380, 0, 0),
+    ("EQ-003", "TurboMax",      "ABB",       3000, 220, 0, 1),
+    ("EQ-004", "ProLine-1",     "Schneider", 2200, 127, 1, 0),
+    ("EQ-005", "XR-200",        "Siemens",   1500, 220, 1, 0),
+    ("EQ-006", "Compact-R",     "WEG",        550, 380, 1, 1),
+    ("EQ-007", "Delta-V",       "ABB",       4000, 440, 2, 0),
+    ("EQ-008", "ProLine-2",     "Schneider", 1800, 220, 2, 1),
+    ("EQ-009", "W22-100L-2P",   "WEG",       2200, 220, 0, 0),
 ]
 
+PERFIS_REAIS = {
+    "EQ-009": {"t_base": 38.0, "v_base": 2.1, "c_base": 12.3, "r_base": 3520.0, "ruido_t": 0.8, "ruido_v": 0.25, "ruido_c": 0.6, "ruido_r": 40.0},
+}
+
 LIMITES_SEED = [
-    ("temperatura",   20.0,     75.0,     10.0,     90.0,     "°C",  120.0),
+    ("temperatura",   20.0,     75.0,     10.0,     85.0,     "°C",  120.0),
     ("vibracao",      0.0,      4.5,      0.0,      7.1,      "mm/s", 12.0),
     ("corrente",      2.0,      40.0,     1.0,      48.0,     "A",    50.0),
-    ("rpm",           1700.0,   3400.0,   1500.0,   3550.0,   "RPM",  3600.0),
+    ("rpm",           1700.0,   3600.0,   1500.0,   3700.0,   "RPM",  3800.0),
 ]
 
 
@@ -100,10 +130,16 @@ def _seed_historico(con, tag: str, dias: int = 7, freq_min: int = 1):
     ts_start = ts_end - pd.Timedelta(minutes=n * freq_min)
     timestamps = pd.date_range(start=ts_start, periods=n, freq=f"{freq_min}min")
 
-    t_base = rng.uniform(45, 65)
-    v_base = rng.uniform(1.5, 3.5)
-    c_base = rng.uniform(10, 30)
-    r_base = rng.uniform(2400, 3200)
+    perfil = PERFIS_REAIS.get(tag)
+    if perfil:
+        t_base, v_base, c_base, r_base = perfil["t_base"], perfil["v_base"], perfil["c_base"], perfil["r_base"]
+        sigma_t, sigma_v, sigma_c, sigma_r = perfil["ruido_t"], perfil["ruido_v"], perfil["ruido_c"], perfil["ruido_r"]
+    else:
+        t_base = rng.uniform(45, 65)
+        v_base = rng.uniform(1.5, 3.5)
+        c_base = rng.uniform(10, 30)
+        r_base = rng.uniform(2400, 3200)
+        sigma_t, sigma_v, sigma_c, sigma_r = 1.5, 0.4, 1.2, 80.0
 
     drift = 0.0
     if tag in ("EQ-003", "EQ-007"):
@@ -113,10 +149,10 @@ def _seed_historico(con, tag: str, dias: int = 7, freq_min: int = 1):
 
     ramp = np.linspace(0, drift, n)
 
-    temperatura = t_base + rng.normal(0, 1.5, n) + ramp * 35
-    vibracao    = np.clip(v_base + rng.normal(0, 0.4, n) + ramp * 4.5,  0, None)
-    corrente    = np.clip(c_base + rng.normal(0, 1.2, n) + ramp * 18,   0, None)
-    rpm         = r_base + rng.normal(0, 80, n) + ramp * 200
+    temperatura = t_base + rng.normal(0, sigma_t, n) + ramp * 35
+    vibracao    = np.clip(v_base + rng.normal(0, sigma_v, n) + ramp * 4.5,  0, None)
+    corrente    = np.clip(c_base + rng.normal(0, sigma_c, n) + ramp * 18,   0, None)
+    rpm         = r_base + rng.normal(0, sigma_r, n) + ramp * 200
 
     rows = list(zip(
         [tag] * n,
@@ -132,9 +168,23 @@ def _seed_historico(con, tag: str, dias: int = 7, freq_min: int = 1):
     )
 
 
+def _migrar(con):
+    """Aplica ao banco existente as colunas criadas depois dele.
+
+    CREATE TABLE IF NOT EXISTS nao altera tabela ja criada, entao um forzy.db da
+    Sprint 2 fica sem `leituras.aceleracao` e quebra a ingestao da Silver.
+    """
+    colunas = {r["name"] for r in con.execute("PRAGMA table_info(leituras)").fetchall()}
+    if "aceleracao" not in colunas:
+        con.execute("ALTER TABLE leituras ADD COLUMN aceleracao REAL")
+
+
 def init_db():
+    from app.services.ingestao_silver import ingerir_silver
+
     with conexao() as con:
         con.executescript(SCHEMA)
+        _migrar(con)
 
         con.executemany(
             "INSERT OR REPLACE INTO limites VALUES (?,?,?,?,?,?,?)",
@@ -172,3 +222,6 @@ def init_db():
         if tem_leituras == 0:
             for tag, *_ in EQUIPAMENTOS_SEED:
                 _seed_historico(con, tag)
+
+        # ativo de campo: dado real vindo da camada Silver do Data Lake
+        ingerir_silver(con)

@@ -71,6 +71,14 @@ else:
         st_g  = statuses[g]
         cor   = COR_PLOTLY[st_g]
 
+        if valor is None:
+            col.markdown(html_titulo_grandeza(rotulos[g], ""), unsafe_allow_html=True)
+            col.markdown(
+                html_placeholder_vazio("Sensor não instalado", padding_px=76),
+                unsafe_allow_html=True,
+            )
+            continue
+
         fig = go.Figure(
             go.Indicator(
                 mode="gauge+number",
