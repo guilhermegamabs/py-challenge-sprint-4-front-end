@@ -126,7 +126,11 @@ async def _http_erro(request: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def _validacao_erro(request: Request, exc: RequestValidationError):
-    campos = ", ".join(".".join(str(p) for p in e["loc"][1:]) for e in exc.errors())
+    erros = exc.errors()
+    if any(e["type"] == "json_invalid" for e in erros):
+        return _erro(422, "dados_invalidos",
+                     "Corpo da requisição não é um JSON válido.", request)
+    campos = ", ".join(".".join(str(p) for p in e["loc"][1:]) for e in erros)
     return _erro(422, "dados_invalidos", f"Verifique os campos: {campos}.", request)
 
 

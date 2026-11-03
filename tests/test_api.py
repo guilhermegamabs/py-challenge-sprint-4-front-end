@@ -93,6 +93,7 @@ def test_erros_do_framework_saem_no_formato_padrao(cliente):
                      headers={"Content-Type": "application/json"})
     assert r.status_code in (400, 422)
     assert set(r.json()) == {"erro", "mensagem", "trace_id"}
+    assert r.json()["mensagem"] == "Corpo da requisição não é um JSON válido."
 
     r = cliente.get("/rota-que-nao-existe")
     assert r.status_code == 404
