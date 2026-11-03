@@ -1,0 +1,31 @@
+$ curl -i http://localhost:8000/ativos            # sem X-API-Key
+HTTP/1.1 401 Unauthorized
+content-length: 122
+content-type: application/json
+x-trace-id: 66060ca09d7f4fed
+x-duracao-ms: 1
+
+{"erro":"nao_autorizado","mensagem":"Chave de API ausente ou inválida (header X-API-Key).","trace_id":"66060ca09d7f4fed"}
+
+
+$ curl -i -H "X-API-Key: ***" -H "X-Trace-Id: demo-sprint4" http://localhost:8000/ativos/EQ-004/diagnostico
+HTTP/1.1 200 OK
+content-length: 498
+content-type: application/json
+x-trace-id: demo-sprint4
+x-duracao-ms: 12
+
+{"tag":"EQ-004","ts":"2026-11-03 16:13:42.310078","score":0.3539,"threshold":1.7317,"alarme":true,"severidade":"warn","feature_dominante":"temperatura","pista":"térmico (rolamento, ventilação obstruída, sobrecarga, ambiente)","detectores":{"residuo":false,"cusum":true,"variancia":false},"residuo_por_feature":{"temperatura":0.8691,"vibracao":0.1344,"corrente":0.1236,"rpm":0.0249},"features_avaliadas":["temperatura","vibracao","corrente","rpm"],"n_amostras":177,"detectores_ativos":["cusum"]}
+
+
+$ curl -H "X-API-Key: ***" http://localhost:8000/ativos/NAO-EXISTE
+{"erro":"nao_encontrado","mensagem":"Ativo NAO-EXISTE não encontrado.","trace_id":"4c6e279e6d6247d8"}
+
+$ curl -X POST -H "X-API-Key: ***" -H "Content-Type: application/json" -d '{"util": true, "comentario": "Recomendação correta"}' http://localhost:8000/eventos/6/feedback
+{"evento_id":6,"registrado":true}
+
+$ curl -X POST -H "X-API-Key: ***" -H "Content-Type: application/json" -d "{nao e json" http://localhost:8000/eventos/1/feedback
+{"erro":"dados_invalidos","mensagem":"Corpo da requisição não é um JSON válido.","trace_id":"ac3c85b219e34f94"}
+
+$ curl -H "X-API-Key: ***" http://localhost:8000/feedback/resumo
+[{"origem_resumo":"gemini","avaliacoes":1,"uteis":1,"taxa_aprovacao":1.0}]

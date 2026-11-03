@@ -1,4 +1,4 @@
-# Challenge Sprint 3: Inteligência Operacional e Apoio à Decisão
+# Challenge Sprint 4: Documentação Final do Projeto
 
 ### FRONT END & MOBILE DEVELOPMENT
 
@@ -24,7 +24,23 @@ Evolução das Sprints 1 e 2: antes o operador precisava abrir cada equipamento 
 
 ---
 
-## O que a Sprint 3 acrescenta
+## Sprint 4 — Documentação Final
+
+**Documentação completa:** [`docs/DOCUMENTACAO_FINAL.md`](docs/DOCUMENTACAO_FINAL.md) (também em PDF: [`docs/DOCUMENTACAO_FINAL.pdf`](docs/DOCUMENTACAO_FINAL.pdf)). Evidências visuais em [`docs/prints/`](docs/prints/).
+
+A Sprint 4 não tem funcionalidade nova. Partindo do commit `4df555c Sprint 3`, o repositório traz:
+
+| Mudança | Commit |
+|---|---|
+| Escape de todo texto externo (OCR, cadastro, LLM) nos componentes HTML | `82f92e6` |
+| 22 testes automatizados — detectores, componentes e API | `43695c3` |
+| Versões fixadas nas dependências | `1c17b0b` |
+| `.pyc` removidos do versionamento | `1ce16aa` |
+| **Ir além:** protótipo de API REST em FastAPI com API Key, `trace_id`, erros amigáveis e feedback de IA | `aa64f08`, `e0727a6`, `585134e` |
+
+---
+
+## O que a Sprint 3 acrescentou
 
 | Recurso | Descrição |
 |---|---|
@@ -108,7 +124,12 @@ O prompt recebe o diagnóstico completo em JSON e pede título, texto e 3 recome
 ```
 front-end/
 ├── main.py                            # entry point + init_db + roteamento de páginas
-├── requirements.txt
+├── requirements.txt                   # dependências do front (versões fixadas)
+├── requirements-dev.txt               # + testes e API
+├── pytest.ini
+├── api/                               # Sprint 4 — protótipo REST FastAPI (main.py, feedback.py)
+├── tests/                             # Sprint 4 — pytest: analítico, componentes, API
+├── docs/                              # Sprint 4 — documentação final, prints e evidências
 ├── modelo_lstm_forecaster.ipynb       # notebook de Modelagem — origem dos detectores
 ├── part-000.parquet                   # camada Silver do Data Lake (MOTOR-220V-01)
 ├── .streamlit/
@@ -194,8 +215,8 @@ Os demais equipamentos seguem perfis sintéticos para fins de demonstração.
 
 **1. Clone o repositório**
 ```bash
-git clone git@github.com:guilhermegamabs/py-challenge-sprint-2-front-end-mobile-development.git
-cd py-challenge-sprint-2-front-end-mobile-development
+git clone https://github.com/guilhermegamabs/py-challenge-sprint-4-front-end.git
+cd py-challenge-sprint-4-front-end
 ```
 
 **2. Crie e ative o ambiente virtual**
@@ -236,6 +257,19 @@ streamlit run main.py
 ```
 
 Na primeira execução o banco `data/forzy.db` é criado e populado automaticamente. O app abre em `http://localhost:8501`.
+
+---
+
+### Testes e API (Sprint 4)
+
+```bash
+pip install -r requirements-dev.txt
+pytest                                   # 22 testes
+
+# PowerShell
+$env:FORZY_API_KEY = "<gere com: openssl rand -base64 24>"
+uvicorn api.main:app --port 8000         # documentação em http://localhost:8000/docs
+```
 
 ---
 
