@@ -1,4 +1,15 @@
+import html
+
 import streamlit as st
+
+
+def esc(valor) -> str:
+    """Escapa texto antes de interpolar em HTML renderizado com unsafe_allow_html.
+
+    TAG, modelo e fabricante chegam do OCR e do cadastro manual; título e resumo
+    chegam da LLM. Um `<` em qualquer um deles quebrava o card ou injetava markup.
+    """
+    return "" if valor is None else html.escape(str(valor))
 
 CORES = {
     "primary":     "#FFB300",
@@ -130,14 +141,14 @@ def html_card_equipamento(tag: str, modelo: str, fabricante: str,
 <div style="border:1px solid {cor_borda}; border-radius:10px;
             padding:14px 16px; background:{CORES['bg_card']}; margin-bottom:8px;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong style="color:{CORES['primary']}; font-size:1.05rem;">{tag}</strong>
+        <strong style="color:{CORES['primary']}; font-size:1.05rem;">{esc(tag)}</strong>
         {badge_html}
     </div>
     <div style="color:{CORES['text_dim']}; font-size:0.85rem; margin-top:6px;">
-        {modelo} · {fabricante}
+        {esc(modelo)} · {esc(fabricante)}
     </div>
     <div style="color:{CORES['text_muted']}; font-size:0.78rem; margin-top:4px;">
-        {potencia} W · {tensao} V
+        {esc(potencia)} W · {esc(tensao)} V
     </div>
 </div>
 """
@@ -145,7 +156,9 @@ def html_card_equipamento(tag: str, modelo: str, fabricante: str,
 
 def html_header_ativo(planta: str, area: str, modelo: str, fabricante: str,
                       potencia: int, tensao: int) -> str:
-    breadcrumb = f"{planta or '—'}  ›  {area or '—'}"
+    breadcrumb = f"{esc(planta or '—')}  ›  {esc(area or '—')}"
+    modelo, fabricante = esc(modelo), esc(fabricante)
+    potencia, tensao = esc(potencia), esc(tensao)
     return f"""
 <div style="background:{CORES['bg_card']}; border-left:4px solid {CORES['primary']};
             padding:14px 18px; border-radius:6px;">
@@ -176,11 +189,11 @@ def html_titulo_grandeza(rotulo: str, badge_html: str) -> str:
 
 
 def html_linha_check(texto: str) -> str:
-    return f'<span style="color:{CORES["ok"]};">✓</span> {texto}'
+    return f'<span style="color:{CORES["ok"]};">✓</span> {esc(texto)}'
 
 
 def html_linha_alerta(texto: str) -> str:
-    return f'<span style="color:{CORES["warn"]};">⚠</span> {texto}'
+    return f'<span style="color:{CORES["warn"]};">⚠</span> {esc(texto)}'
 
 
 def estilo_severidade_pandas(valor: str) -> str:

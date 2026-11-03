@@ -8,7 +8,7 @@ desvio, verde para baseline.
 
 import streamlit as st
 
-from app.components.estilos import COR_BORDA_STATUS, CORES
+from app.components.estilos import COR_BORDA_STATUS, CORES, esc
 from app.components.status_badge import html_badge
 
 ROTULO_GRANDEZA = {
@@ -102,14 +102,14 @@ def html_card_alerta(
     if valor is not None and rotulo_g:
         medida = (
             f'<span style="color:{CORES["text_light"]}; font-weight:700;">'
-            f'{rotulo_g}: {valor:.2f} {unidade or ""}</span>'
+            f'{rotulo_g}: {valor:.2f} {esc(unidade)}</span>'
         )
 
     linha_pista = ""
     if pista:
         linha_pista = (
             f'<div style="color:{CORES["text_muted"]}; font-size:0.78rem; margin-top:8px;">'
-            f"Causa provável: {pista}</div>"
+            f"Causa provável: {esc(pista)}</div>"
         )
 
     # Sem linhas em branco: no markdown do Streamlit, uma linha vazia encerra o
@@ -120,13 +120,13 @@ def html_card_alerta(
         ' margin-bottom:10px;">'
         '<div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">'
         '<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">'
-        f'<strong style="color:{CORES["primary"]}; font-size:1.05rem;">{tag}</strong>'
+        f'<strong style="color:{CORES["primary"]}; font-size:1.05rem;">{esc(tag)}</strong>'
         f"{html_chip_origem(origem)}</div>"
         f"{html_badge(severidade)}</div>"
         f'<div style="color:{CORES["text_light"]}; font-size:0.98rem; font-weight:700;'
-        f' margin-top:10px;">{titulo}</div>'
+        f' margin-top:10px;">{esc(titulo)}</div>'
         f'<div style="color:{CORES["text_dim"]}; font-size:0.87rem; line-height:1.5;'
-        f' margin-top:6px;">{resumo}</div>'
+        f' margin-top:6px;">{esc(resumo)}</div>'
         f"{linha_pista}"
         f"{html_barra_score(score, threshold)}"
         '<div style="display:flex; justify-content:space-between; align-items:center;'
@@ -134,7 +134,7 @@ def html_card_alerta(
         f'<div style="color:{CORES["text_sub"]}; font-size:0.78rem;">{medida}</div>'
         '<div style="display:flex; align-items:center; gap:8px;">'
         f"{html_chip_resumo(origem_resumo)}"
-        f'<span style="color:{CORES["text_muted"]}; font-size:0.72rem;">{local} · {ts_texto}</span>'
+        f'<span style="color:{CORES["text_muted"]}; font-size:0.72rem;">{esc(local)} · {esc(ts_texto)}</span>'
         "</div></div></div>"
     )
 
@@ -155,7 +155,7 @@ def html_card_recomendacao(prioridade: int, acao: str, contexto: str = "") -> st
     """
     rotulo, cor = PRIORIDADES.get(prioridade, PRIORIDADES[3])
     linha_contexto = (
-        f'<div style="color:{CORES["text_muted"]}; font-size:0.74rem; margin-top:6px;">{contexto}</div>'
+        f'<div style="color:{CORES["text_muted"]}; font-size:0.74rem; margin-top:6px;">{esc(contexto)}</div>'
         if contexto else ""
     )
     return (
@@ -165,7 +165,7 @@ def html_card_recomendacao(prioridade: int, acao: str, contexto: str = "") -> st
         f'<div style="color:{cor}; font-size:0.7rem; font-weight:700; text-transform:uppercase;'
         f' letter-spacing:0.06em;">{rotulo}</div>'
         f'<div style="color:{CORES["text_light"]}; font-size:0.9rem; margin-top:8px;'
-        f' line-height:1.45;">{acao}</div>'
+        f' line-height:1.45;">{esc(acao)}</div>'
         f"{linha_contexto}"
         "</div>"
     )
@@ -178,11 +178,11 @@ def html_painel_resumo(titulo: str, texto: str, origem_resumo: str, atualizado: 
             border-radius:10px; padding:16px 20px; background:{CORES['bg_card']};">
     <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;
                 flex-wrap:wrap;">
-        <strong style="color:{CORES['text_light']}; font-size:1.02rem;">{titulo}</strong>
+        <strong style="color:{CORES['text_light']}; font-size:1.02rem;">{esc(titulo)}</strong>
         {html_chip_resumo(origem_resumo)}
     </div>
     <div style="color:{CORES['text_dim']}; font-size:0.88rem; line-height:1.55; margin-top:8px;">
-        {texto}
+        {esc(texto)}
     </div>
     <div style="color:{CORES['text_muted']}; font-size:0.72rem; margin-top:10px;">
         Atualizado em {atualizado}
