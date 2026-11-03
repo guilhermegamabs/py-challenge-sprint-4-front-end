@@ -23,6 +23,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.services import analitico, eventos
 from app.services.db import init_db
@@ -103,12 +104,24 @@ def _erro(status: int, codigo: str, mensagem: str, request: Request) -> JSONResp
     )
 
 
-@app.exception_handler(HTTPException)
-async def _http_erro(request: Request, exc: HTTPException):
+# Erros que o próprio framework levanta (rota inexistente, corpo que não é JSON
+# válido) vêm com texto em inglês; o operador recebe a versão em português.
+MENSAGENS_FRAMEWORK = {
+    "Not Found": "Rota não encontrada.",
+    "Method Not Allowed": "Método HTTP não permitido nesta rota.",
+    "There was an error parsing the body": "Corpo da requisição inválido: envie JSON em UTF-8.",
+}
+
+
+# Registrado na classe do Starlette, não na do FastAPI: a do FastAPI é subclasse,
+# então só assim os erros levantados pelo framework também saem no formato padrão.
+@app.exception_handler(StarletteHTTPException)
+async def _http_erro(request: Request, exc: StarletteHTTPException):
     codigo = {401: "nao_autorizado", 404: "nao_encontrado", 503: "indisponivel"}.get(
         exc.status_code, "requisicao_invalida"
     )
-    return _erro(exc.status_code, codigo, str(exc.detail), request)
+    mensagem = MENSAGENS_FRAMEWORK.get(str(exc.detail), str(exc.detail))
+    return _erro(exc.status_code, codigo, mensagem, request)
 
 
 @app.exception_handler(RequestValidationError)

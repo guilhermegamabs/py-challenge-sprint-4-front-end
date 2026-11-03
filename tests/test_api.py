@@ -86,3 +86,14 @@ def test_feedback_de_resumo(cliente):
                          "taxa_aprovacao": 1.0}]
 
     assert cliente.post("/eventos/999999/feedback", json={"util": False}).status_code == 404
+
+
+def test_erros_do_framework_saem_no_formato_padrao(cliente):
+    r = cliente.post("/eventos/1/feedback", content=b"{nao e json",
+                     headers={"Content-Type": "application/json"})
+    assert r.status_code in (400, 422)
+    assert set(r.json()) == {"erro", "mensagem", "trace_id"}
+
+    r = cliente.get("/rota-que-nao-existe")
+    assert r.status_code == 404
+    assert r.json()["mensagem"] == "Rota não encontrada."
