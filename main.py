@@ -29,7 +29,7 @@ paginas = {
 
 with st.sidebar:
     st.markdown(
-        '<p style="text-align:center; color:#888; font-size:0.8rem; margin:0;">Sprint 3 — Inteligência Operacional</p>',
+        '<p style="text-align:center; color:#888; font-size:0.8rem; margin:0;">Sprint 4 — Documentação Final</p>',
         unsafe_allow_html=True,
     )
     st.divider()
