@@ -2,8 +2,11 @@
 
 ## Challenge Sprint 4 · Documentação Final do Projeto
 
-**Disciplina:** Front End & Mobile Development · **Professor:** Lucas Tadeu Cunha Rios
-**Repositório:** https://github.com/guilhermegamabs/py-challenge-sprint-4-front-end
+**Disciplina:** Front End & Mobile Development
+
+**Professor:** Lucas Tadeu Cunha Rios
+
+**Repositório:** [https://github.com/guilhermegamabs/py-challenge-sprint-4-front-end](https://github.com/guilhermegamabs/py-challenge-sprint-4-front-end)
 
 | Integrante | RM |
 |---|---|
@@ -27,7 +30,7 @@ A Forzy precisa que o operador de manutenção saiba **qual motor está degradan
 
 A Sprint 4 não traz funcionalidade nova. Este documento registra **o que mudou desde a entrega da Sprint 3**, os diferenciais e resultados da solução, o que ficou pendente e por quê, e uma proposta de evolução para arquitetura de produção.
 
-O repositório da Sprint 4 foi criado **a partir do histórico da Sprint 3**: os commits anteriores estão preservados e cada mudança desta sprint é um commit isolado sobre `4df555c Sprint 3`. É por eles que a comparação pode ser conferida.
+O repositório da Sprint 4 foi criado **a partir do histórico da Sprint 3**: os commits anteriores estão preservados e cada mudança desta sprint é um commit isolado sobre a entrega da Sprint 3. É por eles que a comparação pode ser conferida no GitHub.
 
 ---
 
@@ -35,7 +38,7 @@ O repositório da Sprint 4 foi criado **a partir do histórico da Sprint 3**: os
 
 ### 2.1 Ponto de partida — o que a Sprint 3 entregou
 
-Commit `4df555c` (15/08/2026). Sete telas, organizadas em três grupos na sidebar:
+Entrega de 15/08/2026. Sete telas, organizadas em três grupos na sidebar:
 
 | Tela | Estado na Sprint 3 |
 |---|---|
@@ -58,18 +61,18 @@ Camada analítica: resíduo de previsão, CUSUM e variância de janela (`app/ser
 
 ### 2.2 O que foi adicionado, alterado ou corrigido
 
-| Commit | Tipo | Mudança | Resolve |
-|---|---|---|---|
-| `1ce16aa` | qualidade | Remove `.pyc` do versionamento | D4 |
-| `82f92e6` | correção | Helper `esc()` e escape em todos os componentes que recebem texto externo | D1 |
-| `1c17b0b` | qualidade | Versões fixadas em `requirements.txt` | D3 |
-| `43695c3` | qualidade | 22 testes automatizados (`pytest`) | D2 |
-| `aa64f08` | arquitetura | Protótipo de API REST em FastAPI sobre a mesma camada de serviços | D5 (seção 5) |
-| `b111b0a` | interface | Rótulo da sidebar atualizado para a Sprint 4 | — |
-| `e0727a6` | correção | Erros do próprio framework também saem no formato padrão em português | achado nesta sprint |
-| `585134e` | correção | Mensagem legível quando o corpo da requisição não é JSON | achado nesta sprint |
+| Tipo | Mudança | Resolve |
+|---|---|---|
+| qualidade | Remove `.pyc` do versionamento | D4 |
+| correção | Helper `esc()` e escape em todos os componentes que recebem texto externo | D1 |
+| qualidade | Versões fixadas em `requirements.txt` | D3 |
+| qualidade | 22 testes automatizados (`pytest`) | D2 |
+| arquitetura | Protótipo de API REST em FastAPI sobre a mesma camada de serviços | D5 (seção 5) |
+| interface | Rótulo da sidebar atualizado para a Sprint 4 | — |
+| correção | Erros do próprio framework também saem no formato padrão em português | achado nesta sprint |
+| correção | Mensagem legível quando o corpo da requisição não é JSON | achado nesta sprint |
 
-Total: **18 arquivos alterados, 611 linhas adicionadas, 25 removidas** (`git diff --stat 4df555c..HEAD`). Nenhuma tela foi removida nem teve comportamento alterado para o operador, além da correção de exibição do item D1.
+Total: **18 arquivos alterados, 611 linhas adicionadas, 25 removidas**. Nenhuma tela foi removida nem teve comportamento alterado para o operador, além da correção de exibição do item D1.
 
 ### 2.3 Comparativos antes / depois
 
@@ -195,24 +198,6 @@ Os quatro `.pyc` removidos (`app/__pycache__/componentes.cpython-314.pyc`, `dado
 | Antes | Depois |
 |---|---|
 | ![Sidebar Sprint 3](prints/antes_sidebar.png) | ![Sidebar Sprint 4](prints/depois_sidebar.png) |
-
-#### e) Linha do tempo do repositório
-
-```text
-0c7ba79  2026-04-18  Sprint 1 - Interface Inicial
-1219fbf  2026-04-18  feat: sprint 1 - interface de cadastro e consulta de equipamentos
-b89f9f8  2026-05-24  sprint 2: dashboards operacionais, OCR Gemini, SQLite
-4a1b2bc  2026-05-24  Organização do css do projeto
-4df555c  2026-08-15  Sprint 3                                   ◄── ponto de partida
-1ce16aa  2026-11-03  chore: remove bytecode compilado do versionamento
-82f92e6  2026-11-03  fix: escapa texto dinamico nos componentes HTML
-1c17b0b  2026-11-03  build: fixa versoes das dependencias
-43695c3  2026-11-03  test: cobre detectores de anomalia e escape dos componentes
-aa64f08  2026-11-03  feat(api): prototipo REST FastAPI sobre a camada de services
-b111b0a  2026-11-03  chore: rotulo da sidebar para Sprint 4
-e0727a6  2026-11-03  fix(api): erros do framework tambem no formato padrao
-585134e  2026-11-03  fix(api): mensagem legivel para corpo que nao e JSON
-```
 
 ---
 
@@ -370,7 +355,7 @@ Hoje a interface Streamlit **é** o backend: a página importa `app/services/` e
 
 ### 5.3 Protótipo implementado
 
-Pasta `api/`, commit `aa64f08`. Roda com `uvicorn api.main:app --port 8000`; documentação interativa em `/docs`.
+Pasta `api/`. Roda com `uvicorn api.main:app --port 8000`; documentação interativa em `/docs`.
 
 ![Swagger do protótipo](prints/i1_swagger.jpg)
 
@@ -405,7 +390,7 @@ $ curl -X POST ... -d "{nao e json" http://localhost:8000/eventos/1/feedback
 {"erro":"dados_invalidos","mensagem":"Corpo da requisição não é um JSON válido.","trace_id":"ac3c85b219e34f94"}
 ```
 
-Ao capturar estas evidências, o grupo encontrou dois casos em que o erro ainda saía no formato cru do framework (`{"detail": "There was an error parsing the body"}`). O handler estava registrado na `HTTPException` do FastAPI, mas o Starlette levanta a classe-mãe. Os commits `e0727a6` e `585134e` corrigem isso, com teste.
+Ao capturar estas evidências, o grupo encontrou dois casos em que o erro ainda saía no formato cru do framework (`{"detail": "There was an error parsing the body"}`). O handler estava registrado na `HTTPException` do FastAPI, mas o Starlette levanta a classe-mãe. A correção foi feita nesta sprint, com teste.
 
 **Trace propagado pelo cliente:**
 
