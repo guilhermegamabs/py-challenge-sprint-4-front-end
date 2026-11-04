@@ -38,7 +38,7 @@ O repositório da Sprint 4 foi criado **a partir do histórico da Sprint 3**: os
 
 ### 2.1 Ponto de partida — o que a Sprint 3 entregou
 
-Entrega de 15/08/2026. Sete telas, organizadas em três grupos na sidebar:
+Sete telas, organizadas em três grupos na sidebar:
 
 | Tela | Estado na Sprint 3 |
 |---|---|
@@ -72,7 +72,7 @@ Camada analítica: resíduo de previsão, CUSUM e variância de janela (`app/ser
 | correção | Erros do próprio framework também saem no formato padrão em português | achado nesta sprint |
 | correção | Mensagem legível quando o corpo da requisição não é JSON | achado nesta sprint |
 
-Total: **18 arquivos alterados, 611 linhas adicionadas, 25 removidas**. Nenhuma tela foi removida nem teve comportamento alterado para o operador, além da correção de exibição do item D1.
+Nenhuma tela foi removida nem teve comportamento alterado para o operador, além da correção de exibição do item D1.
 
 ### 2.3 Comparativos antes / depois
 
